@@ -112,7 +112,7 @@ public class NPC : MonoBehaviour
                     yield return cut.DoActionWithMovement(movement);
                 Destroy(tree);
             }
-
+            
             while (!ResourceManager.Instance.HasResources(0, 3, 0))
             {
                 var a = planner.GetNextAction("HasStone");
@@ -120,7 +120,7 @@ public class NPC : MonoBehaviour
                     yield return mine.DoActionWithMovement(movement);
                 Destroy(stone);
             }
-    
+            
             while (!ResourceManager.Instance.HasResources(0, 0, 2))
             {
                 var a = planner.GetNextAction("HasFood");
