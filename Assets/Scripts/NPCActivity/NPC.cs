@@ -77,6 +77,29 @@ public class NPC : MonoBehaviour
             StartCoroutine(PlanToBuildHouse());
         }
     }
+    
+    public void MineStoneForButton()
+    {
+        if (!isBuildingHouse && !worldState.HasState("HasStone"))
+        {
+            isBuildingHouse = true;
+            StartCoroutine(PlanToMineStone());
+        }
+    }
+    IEnumerator PlanToMineStone()
+    {
+        if (!worldState.HasState("HasStone"))
+        {
+            while (!ResourceManager.Instance.HasResources(0, 3, 0))
+            {
+                var a = planner.GetNextAction("HasStone");
+                if (a is MineStone mine)
+                    yield return mine.DoActionWithMovement(movement);
+                Destroy(stone);
+            }
+        }
+        isBuildingHouse = false;
+    }
 
     IEnumerator PlanToBuildHouse()
     {
@@ -109,7 +132,10 @@ public class NPC : MonoBehaviour
             yield return movement.MoveToDestination(buildPosition.position);
 
             var build = planner.GetNextAction("HasHouse");
-            build?.DoAction();
+            if (build is BuildHouse buildHouse)
+            {
+                buildHouse.DoAction();
+            }
         }
         isBuildingHouse = false;
     }
