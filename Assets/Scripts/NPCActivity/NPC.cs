@@ -17,6 +17,12 @@ public class NPC : MonoBehaviour
     private MineStone mineStone;
     private Harvest harvest;
     private BuildHouse buildHouse;
+
+    public Transform[] patrolPoints;
+    private int patrolIndex = 0;
+    private bool isBuildingHouse = false;
+    private float speed = 2f;
+    
     void Start()
     {
         worldState = new WorldState();
@@ -44,9 +50,32 @@ public class NPC : MonoBehaviour
 
     }
 
+    void Update()
+    {
+        if (!isBuildingHouse && patrolPoints != null && patrolPoints.Length > 0)
+        {
+            Patrol();
+        }
+    }
+
+    void Patrol()
+    {
+        Transform target = patrolPoints[patrolIndex];
+        transform.position = Vector3.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
+
+        if (Vector3.Distance(transform.position, target.position) < 0.1f)
+        {
+            patrolIndex = (patrolIndex + 1) % patrolPoints.Length;
+        }
+    }
+
     public void BuildHouseForButton()
     {
-        StartCoroutine(PlanToBuildHouse());
+        if (!isBuildingHouse)
+        {
+            isBuildingHouse = true;
+            StartCoroutine(PlanToBuildHouse());
+        }
     }
 
     IEnumerator PlanToBuildHouse()
@@ -82,5 +111,6 @@ public class NPC : MonoBehaviour
             var build = planner.GetNextAction("HasHouse");
             build?.DoAction();
         }
+        isBuildingHouse = false;
     }
 }
